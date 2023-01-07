@@ -12,7 +12,7 @@ func getWithHttp(addr string) []byte {
 		log.Fatalln(err)
 	}
 
-	log.Infof("Got response for %s: %#v", addr, rsp)
+	//log.Infof("Got response for %s: %#v", addr, rsp)
 
 	body, err := io.ReadAll(rsp.Body)
 	if err != nil {

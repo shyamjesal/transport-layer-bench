@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	certFile = "certs/localhost.crt"
-	keyFile  = "certs/localhost.key"
+	certFile = "../certs/localhost.crt"
+	keyFile  = "../certs/localhost.key"
 )
 
 func getWithQuic(addr string, hclient http.Client) []byte {
@@ -16,7 +16,7 @@ func getWithQuic(addr string, hclient http.Client) []byte {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Infof("Got response for %s: %#v", addr, rsp)
+	//log.Infof("Got response for %s: %#v", addr, rsp)
 
 	body, err := io.ReadAll(rsp.Body)
 	if err != nil {

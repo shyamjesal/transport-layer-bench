@@ -21,6 +21,7 @@ import (
 func main() {
 	transferProtocol := flag.String("transportProtocol", "quic", "tcp/quic")
 	addr := flag.String("serverAddr", "https://localhost:8090", "server address")
+	concurrency := flag.Int("concurrency", 1, "number > 0")
 	flag.Parse()
 
 	// Get the SystemCertPool, continue with an empty pool on error
@@ -65,50 +66,36 @@ func main() {
 		IPAddrs: []net.IPAddr{*ip},
 		Port:    port,
 	}
-	buf := make([]byte, 10240)
 	now := time.Now()
 	if *transferProtocol == "quic" {
-		log.Infof("Received msg of length %d", len(getWithQuic(*addr, *hclient)))
-	} else if *transferProtocol == "http" {
-		log.Infof("Received msg of length %d", len(getWithHttp(*addr)))
+		log.Infof("Received msg of length %d", len(getWithQuic("https://"+*addr, *hclient)))
+	} else if *transferProtocol == "http" || *transferProtocol == "fasthttp" {
+		log.Infof("Received msg of length %d", len(getWithHttp("http://"+*addr)))
 	} else if *transferProtocol == "grpc" {
 		log.Infof("Received msg of length %d", len(getWithGrpc(*addr)))
 	} else if *transferProtocol == "kcp" {
 		log.Infof("Received msg of length %d", len(getWithKcp(*addr)))
 	} else if *transferProtocol == "tcp" {
-		conn, err := net.Dial("tcp", *addr)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer conn.Close()
-		buf := make([]byte, 10240)
-
-		_, err = conn.Read(buf)
-		if err != nil {
-			log.Fatal(err)
-		}
+		log.Infof("Received msg of length %d", len(getWithTcp(*addr)))
+	} else if *transferProtocol == "tcpmarshall" {
+		log.Infof("Received msg of length %d", len(getWithTcpMarshal(*addr)))
 	} else if *transferProtocol == "sctp" {
-		var laddr *sctp.SCTPAddr
-		conn, err := sctp.DialSCTP("sctp", laddr, sctpAddr)
-		if err != nil {
-			log.Fatalf("failed to dial: %v", err)
+		log.Infof("Received msg of length %d", len(getWithSctp(sctpAddr)))
+	} else if *transferProtocol == "capnp" {
+		var channel = make(chan []byte)
+		for i := 0; i < *concurrency; i += 1 {
+			go func() {
+				channel <- getWithCapnp(*addr)
+			}()
 		}
-		defer conn.Close()
-		//sndbuf, err := conn.GetWriteBuffer()
-		//if err != nil {
-		//	log.Fatalf("failed to get write buf: %v", err)
-		//}
-		//rcvbuf, err := conn.GetReadBuffer()
-		//if err != nil {
-		//	log.Fatalf("failed to get read buf: %v", err)
-		//}
-		//log.Printf("SndBufSize: %d, RcvBufSize: %d", sndbuf, rcvbuf)
-
-		n, _, err := conn.SCTPRead(buf)
-		if err != nil {
-			log.Fatalf("failed to read: %v", err)
+		for i := 0; i < *concurrency; i += 1 {
+			log.Infof("Received msg of length %d", len(<-channel))
 		}
-		log.Printf("read: len %d", n)
+	} else if *transferProtocol == "flatbuf" {
+		log.Infof("Received msg of length %d", len(getWithFlatbuf(*addr)))
+	} else {
+		log.Fatal("Invalid transfer type")
 	}
+
 	log.Infof("%v", time.Since(now))
 }

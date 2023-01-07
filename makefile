@@ -33,3 +33,28 @@ client-image-push: client-image
 
 server-image-push: server-image
 	docker push vhiveease/transport-layer-bench-server:latest
+
+python-server-run: python-server-build
+	docker run shyamjesal/transfer-bench-python-server:latest python3 capnp_server.py localhost:8090
+
+python-server-build:
+	DOCKER_BUILDKIT=1 docker build \
+    	-t shyamjesal/transfer-bench-python-server:latest \
+    	--target pyserver \
+    	-f Dockerfile \
+    	$(ROOT)
+
+python-client-run: python-client-build
+	docker run shyamjesal/transfer-bench-python-client:latest python3 capnp_client.py localhost:8090
+
+python-client-build:
+	DOCKER_BUILDKIT=1 docker build \
+    	-t shyamjesal/transfer-bench-python-client:latest \
+    	--target pyclient \
+    	-f Dockerfile \
+    	$(ROOT)
+
+python-build: python-client-build python-server-build
+
+python-test: python-build
+	docker compose -f docker-compose.yml up

@@ -3,26 +3,31 @@ module transfer-bench
 go 1.19
 
 require (
-	capnproto.org/go/capnp/v3 v3.0.0-alpha.16
+	capnproto.org/go/capnp/v3 v3.0.0-alpha.17
 	github.com/JoeReid/fastTCP v0.0.0-20170128213645-970c676a0702
 	github.com/ishidawataru/sctp v0.0.0-20210707070123-9a39160e9062
 	github.com/lucas-clemente/quic-go v0.31.1
+	github.com/shyamjesal/transfer-bench/capnp v0.0.0-00010101000000-000000000000
+	github.com/shyamjesal/transfer-bench/flatbuf v0.0.0-00010101000000-000000000000
 	github.com/shyamjesal/transfer-bench/proto v0.0.0-00010101000000-000000000000
 	github.com/sirupsen/logrus v1.9.0
-	github.com/spance/suft v0.0.0-20161129124228-358fdb24d82d
 	github.com/valyala/fasthttp v1.43.0
 	github.com/xtaci/kcp-go/v5 v5.6.1
 	google.golang.org/grpc v1.51.0
 )
 
-replace github.com/shyamjesal/transfer-bench/proto => ./proto/hello
+replace (
+	github.com/shyamjesal/transfer-bench/capnp => ./capnp
+	github.com/shyamjesal/transfer-bench/flatbuf => ./flatbuf/flatMsg
+	github.com/shyamjesal/transfer-bench/proto => ./proto/hello
+)
 
 require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
-	github.com/cloudflare/golibs v0.0.0-20210909181612-21743d7dd02a // indirect
 	github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/google/flatbuffers v22.11.23+incompatible // indirect
 	github.com/google/pprof v0.0.0-20210407192527-94a9f03dee38 // indirect
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/klauspost/cpuid v1.3.1 // indirect
